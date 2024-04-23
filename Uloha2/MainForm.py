@@ -145,9 +145,18 @@ class Ui_MainWindow(object):
         
         #Simplify buildings
         a = Algorithms()
+        evaluation = 0
+        n = len(polygons)
         for pol in polygons:
             pca = a.createERPCA(pol)
-            self.Canvas.setMBR(pca) 
+            
+            #Don't accept poorly simplified buildings and errors
+            if pca is not None:
+                evaluation += 1
+                self.Canvas.setMBR(pca) 
+        
+        #Get result for PCA
+        print(f'PCA accuracy score: {100 * evaluation / n} %')
         
         #Repaint screen
         self.Canvas.repaint()
@@ -159,11 +168,19 @@ class Ui_MainWindow(object):
         
         #Simplify buildings
         a = Algorithms()
+        evaluation = 0
+        n = len(polygons)
         for pol in polygons:
             maer = a.mbr(pol)
+            
+            #Don't accept poorly simplified buildings and errors
             if maer is not None:
+                evaluation += 1
                 self.Canvas.setMBR(maer) 
-                    
+        
+        #Get result for MAER
+        print(f'MAER accuracy score: {100 * evaluation / n} %')
+                   
         #Repaint screen
         self.Canvas.repaint()
     
@@ -174,9 +191,18 @@ class Ui_MainWindow(object):
         
         #Simplify buildings
         a = Algorithms()
+        evaluation = 0
+        n = len(polygons)
         for pol in polygons:
             le = a.longestEdge(pol)
+            
+            #Don't accept poorly simplified buildings and errors
+            if le is not None:
+                evaluation += 1
             self.Canvas.setMBR(le)
+            
+        #Get result for Longest Edge
+        print(f'Longest Edge accuracy score: {100 * evaluation / n} %')
         
         #Repaint screen    
         self.Canvas.repaint()
@@ -188,10 +214,19 @@ class Ui_MainWindow(object):
         
         #Simplify buildings
         a = Algorithms()
+        evaluation = 0
+        n = len(polygons)
         for pol in polygons:
             wa = a.wallAverage(pol)
+            
+            #Don't accept poorly simplified buildings and errors
+            if wa is not None:
+                evaluation += 1
             self.Canvas.setMBR(wa)
-        
+
+        #Get result for Wall Average
+        print(f'Wall Average accuracy score: {100 * evaluation / n} %')
+                
         #Repaint screen    
         self.Canvas.repaint()
     
@@ -202,11 +237,19 @@ class Ui_MainWindow(object):
         
         #Simplify buildings
         a = Algorithms()
+        evaluation = 0
+        n = len(polygons)
         for pol in polygons:
             wb = a.weightedBisector(pol)
+            
+            #Don't accept poorly simplified buildings and errors
             if wb is not None:
+                evaluation += 1
                 self.Canvas.setMBR(wb) 
-        
+
+        #Get result for Weighted Bisector
+        print(f'Weighted Bisector accuracy score: {100 * evaluation / n} %')
+                
         #Repaint screen    
         self.Canvas.repaint()
     

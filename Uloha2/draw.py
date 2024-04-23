@@ -78,7 +78,7 @@ class Draw(QWidget):
         for i, mbr in enumerate(self.mbr):
             
             qp.setPen(Qt.GlobalColor.black)
-            qp.setBrush(Qt.GlobalColor.transparent)
+            qp.setBrush(Qt.GlobalColor.black)
             qp.drawPolygon(mbr)       
             
         self.mbr = []

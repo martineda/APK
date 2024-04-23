@@ -36,6 +36,36 @@ class Algorithms:
         
         return m.acos(max(min(arg, 1), -1))
     
+    def evaluateAccuracy(self, sigma, pol):
+        
+        #Calculate sigma for all points
+        n = len(pol)
+        r_sum = 0
+        for i in range(n):
+            dx = pol[(i+1)%n].x() - pol[i].x()
+            dy = pol[(i+1)%n].y() - pol[i].y()
+            sigma_i = m.atan2(dy, dx)
+            
+            #Fragment
+            k_i = 2*sigma_i/pi
+            
+            #Remainder
+            r_i = (sigma_i - k_i)*pi/2
+            
+            #Get sum of remainders
+            r_sum += r_i
+        
+        #Total angle
+        sigma_pol = pi * r_sum/(2*n)
+        
+        #ER and building angle difference
+        delta_sigma = abs(sigma - sigma_pol)
+        
+        #Accuracy criterion
+        if delta_sigma < 10:
+            return 1
+        return 0
+    
     def cHull(self, pol: QPolygonF):
         
         #Construct Convex Hull (Jarvis)
@@ -93,6 +123,7 @@ class Algorithms:
         y_min = min(pol, key = lambda k: k.y()).y()
         y_max = max(pol, key = lambda k: k.y()).y()
 
+        #Construct min/max box
         v1 = QPointF(x_min, y_min)
         v2 = QPointF(x_max, y_min)
         v3 = QPointF(x_max, y_max)
@@ -138,11 +169,11 @@ class Algorithms:
         Ab = self.getArea(build)
         A = self.getArea(rect)
 
-        # Compute ratio
+        #Compute ratio
         if A != 0:
             k = Ab / A
 
-        #Problémové budovy (díry?)
+        #Buildings with errors
         else:
             return None
         
@@ -219,10 +250,19 @@ class Algorithms:
         
         #Resize rectangle
         mmb_res = self.resizeRectangle(mmb_unrot, pol)
+        
+        #Don't accept errors
         if mmb_res == None:
             return None
         
-        return mmb_res   
+        #Compute accuracy
+        evaluation = self.evaluateAccuracy(sigma_min, pol)
+        
+        #Don't accept poor results
+        if evaluation == 0:
+            return None
+        
+        return mmb_res
 
 
     def createERPCA(self, pol: QPolygonF):
@@ -256,6 +296,17 @@ class Algorithms:
         #Resize enclosing rectangle
         resized_er = self.resizeRectangle(er, pol)
         
+        #Don't accept errors
+        if resized_er == None:
+            return None
+        
+        #Compute accuracy
+        evaluation = self.evaluateAccuracy(sigma, pol)
+        
+        #Don't accept poor results
+        if evaluation == 0:
+            return None        
+        
         return resized_er
     
     def longestEdge(self, pol: QPolygonF):
@@ -282,7 +333,18 @@ class Algorithms:
         
         #Resize enclosing rectangle
         resized_er = self.resizeRectangle(er, pol)
+
+        #Don't accept errors
+        if resized_er == None:
+            return None
         
+        #Compute accuracy
+        evaluation = self.evaluateAccuracy(sigma, pol)
+        
+        #Don't accept poor results
+        if evaluation == 0:
+            return None       
+                
         return resized_er
     
     def wallAverage(self, pol: QPolygonF):
@@ -302,10 +364,10 @@ class Algorithms:
             dy = pol[(i+1)%n].y() - pol[i].y()
             sigma = m.atan2(dy, dx)
             
-            #Calcualte inner angle (omega)
+            #Calculate inner angle (omega)
             omega = abs(sigma - sigma_0)
                 
-            #Fragment
+            #Fragment (remainder)
             k = 2*omega/pi
             
             #Oriented residue
@@ -324,7 +386,18 @@ class Algorithms:
         
         #Resize enclosing rectangle
         resized_er = self.resizeRectangle(er, pol)
+
+        #Don't accept errors
+        if resized_er == None:
+            return None
         
+        #Compute accuracy
+        evaluation = self.evaluateAccuracy(sigma, pol)
+        
+        #Don't accept poor results
+        if evaluation == 0:
+            return None       
+                
         return resized_er
     
     def weightedBisector(self, pol: QPolygonF):
@@ -398,5 +471,16 @@ class Algorithms:
         
         #Resize enclosing rectangle
         resized_er = self.resizeRectangle(er, pol)
+
+        #Don't accept errors
+        if resized_er == None:
+            return None
         
+        #Compute accuracy
+        evaluation = self.evaluateAccuracy(sigma, pol)
+        
+        #Don't accept poor results
+        if evaluation == 0:
+            return None       
+                
         return resized_er
