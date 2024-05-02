@@ -36,35 +36,39 @@ class Algorithms:
         
         return m.acos(max(min(arg, 1), -1))
     
-    def evaluateAccuracy(self, sigma, pol):
+    def accuracyEvaluation(self, er: QPolygon, pol: QPolygon):
         
-        #Calculate sigma for all points
-        n = len(pol)
-        r_sum = 0
-        for i in range(n):
-            dx = pol[(i+1)%n].x() - pol[i].x()
-            dy = pol[(i+1)%n].y() - pol[i].y()
-            sigma_i = m.atan2(dy, dx)
+        #Compute main direction (sigma) for simplification
+        n_er = len(er)
+        len_max = 0
+        for i in range(n_er):
+            dx = er[(i+1)%n_er].x() - er[i].x()
+            dy = er[(i+1)%n_er].y() - er[i].y()
+            len_edge = m.sqrt(dx**2 + dy**2)
+            if len_edge > len_max:
+                len_max = len_edge
+                sigma_er = m.atan2(dy, dx)
+
+
+        #Compute main direction(sigma) for building
+        n_pol = len(pol)
+        sigma_sum = 0
+        for i in range(n_pol):
+            dx = pol[(i+1)%n_pol].x() - pol[i].x()
+            dy = pol[(i+1)%n_pol].y() - pol[i].y()
             
-            #Fragment
-            k_i = 2*sigma_i/pi
-            
-            #Remainder
-            r_i = (sigma_i - k_i)*pi/2
-            
-            #Get sum of remainders
-            r_sum += r_i
+            #Calculate angle and substract simpl. rectangle angle
+            sigma_i = m.atan2(dy, dx) - sigma_er
+            if sigma_i > m.pi:
+                sigma_i -= 2*m.pi
+            sigma_sum += sigma_i   
         
-        #Total angle
-        sigma_pol = pi * r_sum/(2*n)
-        
-        #ER and building angle difference
-        delta_sigma = abs(sigma - sigma_pol)
-        
-        #Accuracy criterion
-        if delta_sigma < 10:
+        #Get total difference and evaluate it
+        sigma = (sigma_sum/n_pol)*180/pi
+        if sigma < 10:
             return 1
-        return 0
+        else:
+            return 0
     
     def cHull(self, pol: QPolygonF):
         
@@ -255,13 +259,6 @@ class Algorithms:
         if mmb_res == None:
             return None
         
-        #Compute accuracy
-        evaluation = self.evaluateAccuracy(sigma_min, pol)
-        
-        #Don't accept poor results
-        if evaluation == 0:
-            return None
-        
         return mmb_res
 
 
@@ -300,13 +297,6 @@ class Algorithms:
         if resized_er == None:
             return None
         
-        #Compute accuracy
-        evaluation = self.evaluateAccuracy(sigma, pol)
-        
-        #Don't accept poor results
-        if evaluation == 0:
-            return None        
-        
         return resized_er
     
     def longestEdge(self, pol: QPolygonF):
@@ -336,14 +326,7 @@ class Algorithms:
 
         #Don't accept errors
         if resized_er == None:
-            return None
-        
-        #Compute accuracy
-        evaluation = self.evaluateAccuracy(sigma, pol)
-        
-        #Don't accept poor results
-        if evaluation == 0:
-            return None       
+            return None 
                 
         return resized_er
     
@@ -390,13 +373,6 @@ class Algorithms:
         #Don't accept errors
         if resized_er == None:
             return None
-        
-        #Compute accuracy
-        evaluation = self.evaluateAccuracy(sigma, pol)
-        
-        #Don't accept poor results
-        if evaluation == 0:
-            return None       
                 
         return resized_er
     
@@ -474,13 +450,6 @@ class Algorithms:
 
         #Don't accept errors
         if resized_er == None:
-            return None
-        
-        #Compute accuracy
-        evaluation = self.evaluateAccuracy(sigma, pol)
-        
-        #Don't accept poor results
-        if evaluation == 0:
-            return None       
+            return None 
                 
         return resized_er

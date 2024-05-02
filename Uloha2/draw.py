@@ -79,7 +79,7 @@ class Draw(QWidget):
             
             qp.setPen(Qt.GlobalColor.black)
             qp.setBrush(Qt.GlobalColor.black)
-            qp.drawPolygon(mbr)       
+            qp.drawPolygon(mbr)
             
         self.mbr = []
                      
